@@ -16,7 +16,7 @@ FROM alpine:3.16.2
 
 ENV PORT=8080
 
-ENV DATABASE_URL="test_url"
+ENV DATABASE_URL="host=localhost port=5432 user=postgres password=postgres dbname=ktaxes sslmode=disable"
 
 ENV ADMIN_USERNAME=adminTax
 
