@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/labstack/echo/v4"
-	"net/http"
+	"fmt"
+	"os"
 )
 
 func main() {
-	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
-	})
-	e.Logger.Fatal(e.Start(":1323"))
+	fmt.Printf("Port: %s\n", os.Getenv("PORT"))
+	fmt.Printf("Database_url: %s\n", os.Getenv("DATABASE_URL"))
+	fmt.Printf("Admin_username: %s\n", os.Getenv("ADMIN_USERNAME"))
+	fmt.Printf("Admin_password: %s\n", os.Getenv("ADMIN_PASSWORD"))
 }
