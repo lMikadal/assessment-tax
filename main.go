@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/lMikadal/assessment-tax/postgres"
+	"github.com/lMikadal/assessment-tax/tax"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,12 +18,10 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	_ = db
 
 	e := echo.New()
-	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Go Bootcamp!")
-	})
+	handler := tax.New(db)
+	e.POST("/tax/calculations", handler.TaxHandler)
 
 	// Start server
 	go func() {
