@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS tax_retes (
+CREATE TABLE IF NOT EXISTS tax_rates (
   id SERIAL PRIMARY KEY,
   minimum_salary INT NOT NULL,
   maximum_salary INT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS tax_retes (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO tax_retes (minimum_salary, maximum_salary, rate) VALUES 
+INSERT INTO tax_rates (minimum_salary, maximum_salary, rate) VALUES 
 (0, 150000, 0),
 (150001, 500000, 10),
 (500001, 1000000, 15),

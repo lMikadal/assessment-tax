@@ -21,6 +21,18 @@ func (m MockTax) TaxByIncome(income uint) ([]DB, error) {
 	return m.db, m.err
 }
 
+func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
+	return DbDeduction{
+		ID:             1,
+		Type:           "Personal",
+		Minimum_amount: 0,
+		Maximum_amount: 0,
+		Amount:         60000,
+		Created_at:     "2021-09-01",
+		Updated_at:     "2021-09-01",
+	}, nil
+}
+
 func TestTaxHandler(t *testing.T) {
 	t.Run("Test Income 500000", func(t *testing.T) {
 		e := echo.New()
@@ -41,7 +53,7 @@ func TestTaxHandler(t *testing.T) {
 
 		want := ResTax{Tax: 29000.0}
 		gotJson := rec.Body.Bytes()
-		// t.Logf("gotJson: %v", string(gotJson))
+		t.Logf("gotJson: %v", string(gotJson))
 
 		var got ResTax
 		if err := json.Unmarshal(gotJson, &got); err != nil {
