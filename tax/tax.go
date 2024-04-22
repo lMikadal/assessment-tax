@@ -6,10 +6,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Tax struct {
-	info InfoTax
-}
-
 type Allowance struct {
 	AllowanceType string  `json:"allowance_type"`
 	Amount        float64 `json:"amount"`
@@ -26,23 +22,27 @@ type ResTax struct {
 }
 
 type DB struct {
-	Minimum_salary float64 `json:"minimum_salary"`
-	Maximum_salary float64 `json:"maximum_salary"`
-	Rate           float64 `json:"rate"`
+	Minimum_salary float64 `postgres:"minimum_salary"`
+	Maximum_salary float64 `postgres:"maximum_salary"`
+	Rate           float64 `postgres:"rate"`
 }
 
-func New(info InfoTax) Tax {
-	return Tax{
-		info: info,
-	}
+type Tax struct {
+	info InfoTax
+}
+
+type Err struct {
+	Message string `json:"message"`
 }
 
 type InfoTax interface {
 	TaxByIncome(income uint) ([]DB, error)
 }
 
-type Err struct {
-	Message string `json:"message"`
+func New(info InfoTax) Tax {
+	return Tax{
+		info: info,
+	}
 }
 
 func (t Tax) TaxHandler(c echo.Context) error {
