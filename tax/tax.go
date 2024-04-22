@@ -10,10 +10,25 @@ type Tax struct {
 	info InfoTax
 }
 
+type Allowance struct {
+	AllowanceType string  `json:"allowance_type"`
+	Amount        float64 `json:"amount"`
+}
+
+type ReqTax struct {
+	TotalIncome float64 `json:"total_income"`
+	Wht         float64 `json:"wht"`
+	Allowances  []Allowance
+}
+
+type ResTax struct {
+	Tax float64 `json:"tax"`
+}
+
 type DB struct {
-	Minimum_salary int `postgres:"minimum_salary"`
-	Maximum_salary int `postgres:"maximum_salary"`
-	Rate           int `postgres:"rate"`
+	Minimum_salary float64 `json:"minimum_salary"`
+	Maximum_salary float64 `json:"maximum_salary"`
+	Rate           float64 `json:"rate"`
 }
 
 func New(info InfoTax) Tax {
@@ -23,7 +38,7 @@ func New(info InfoTax) Tax {
 }
 
 type InfoTax interface {
-	TaxByIncome(income uint) (DB, error)
+	TaxByIncome(income uint) ([]DB, error)
 }
 
 type Err struct {
@@ -31,5 +46,9 @@ type Err struct {
 }
 
 func (t Tax) TaxHandler(c echo.Context) error {
-	return c.JSON(http.StatusOK, Err{Message: "test ok"})
+	// var res DB
+
+	// res, _ = t.info.TaxByIncome(0)
+
+	return c.JSON(http.StatusOK, Err{Message: "success"})
 }
