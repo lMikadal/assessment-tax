@@ -3,6 +3,8 @@ package tax
 import (
 	"fmt"
 	"net/http"
+	"slices"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -75,6 +77,15 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 	if req.Wht > req.TotalIncome {
 		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be less than totalIncome"})
+	}
+
+	if len(req.Allowances) > 0 {
+		allowanceType := []string{"donation", "k-receipt"}
+		for _, v := range req.Allowances {
+			if ok := slices.Contains(allowanceType, strings.ToLower(v.AllowanceType)); !ok {
+				return c.JSON(http.StatusBadRequest, Err{Message: "Not found allowanceType"})
+			}
+		}
 	}
 
 	tax_rate, err := t.info.TaxByIncome(uint(req.TotalIncome))
