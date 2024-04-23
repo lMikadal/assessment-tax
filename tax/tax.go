@@ -73,6 +73,10 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be greater than 0"})
 	}
 
+	if req.Wht > req.TotalIncome {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be less than totalIncome"})
+	}
+
 	tax_rate, err := t.info.TaxByIncome(uint(req.TotalIncome))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
