@@ -79,10 +79,13 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be less than totalIncome"})
 	}
 
-	if len(req.Allowances) > 0 {
-		allowanceType := []string{"donation", "k-receipt"}
+	len_allowances := len(req.Allowances)
+	if len_allowances > 2 {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Allowances must be less than or equal to 2"})
+	} else if len_allowances > 0 {
+		allowance_type := []string{"donation", "k-receipt"}
 		for _, v := range req.Allowances {
-			if ok := slices.Contains(allowanceType, strings.ToLower(v.AllowanceType)); !ok {
+			if ok := slices.Contains(allowance_type, strings.ToLower(v.AllowanceType)); !ok {
 				return c.JSON(http.StatusBadRequest, Err{Message: "Not found allowanceType"})
 			}
 		}
