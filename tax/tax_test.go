@@ -65,7 +65,6 @@ func TestTaxHandler(t *testing.T) {
 
 		want := ResTax{Tax: 29000.0}
 		gotJson := rec.Body.Bytes()
-		t.Logf("gotJson: %v", string(gotJson))
 
 		var got ResTax
 		if err := json.Unmarshal(gotJson, &got); err != nil {
@@ -77,4 +76,45 @@ func TestTaxHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("Test Income less than 0", func(t *testing.T) {
+		e := echo.New()
+		MockReq := ReqTax{
+			TotalIncome: -1.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "donation",
+					Amount:        0.0,
+				},
+			},
+		}
+		reqBody, _ := json.Marshal(MockReq)
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(reqBody))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		mock := MockTax{
+			db: []DB{},
+		}
+
+		handler := New(&mock)
+		handler.TaxHandler(c)
+
+		want := Err{Message: "totalIncome must be greater than 0"}
+		gotJson := rec.Body.Bytes()
+
+		var got Err
+		if err := json.Unmarshal(gotJson, &got); err != nil {
+			t.Errorf("failed to unmarshal json: %v", err)
+		}
+
+		if rec.Code != http.StatusBadRequest {
+			t.Errorf("got: %v, want: %v", rec.Code, http.StatusBadRequest)
+		}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
 }

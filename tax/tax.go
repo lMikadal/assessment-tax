@@ -65,8 +65,8 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: "invalid request"})
 	}
 
-	if req.TotalIncome < 0 {
-		return c.JSON(http.StatusBadRequest, Err{Message: "TotalIncome must be greater than 0"})
+	if req.TotalIncome <= 0 {
+		return c.JSON(http.StatusBadRequest, Err{Message: "totalIncome must be greater than 0"})
 	}
 
 	if req.Wht < 0 {
