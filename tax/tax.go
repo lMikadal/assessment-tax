@@ -24,6 +24,10 @@ type ResTax struct {
 	Tax float64 `json:"tax"`
 }
 
+type ResTaxRefund struct {
+	TaxRefund float64 `json:"taxRefund"`
+}
+
 type DB struct {
 	ID             int     `postgres:"id"`
 	Minimum_salary float64 `postgres:"minimum_salary"`
@@ -127,6 +131,9 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	}
 
 	res.Tax -= req.Wht
+	if res.Tax < 0 {
+		return c.JSON(http.StatusOK, ResTaxRefund{TaxRefund: res.Tax * -1})
+	}
 
 	return c.JSON(http.StatusOK, res)
 }
