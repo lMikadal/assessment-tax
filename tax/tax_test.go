@@ -3,6 +3,7 @@
 package tax
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -25,8 +26,8 @@ func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
 	return DbDeduction{
 		ID:             1,
 		Type:           "Personal",
-		Minimum_amount: 0,
-		Maximum_amount: 0,
+		Minimum_amount: 10000,
+		Maximum_amount: 100000,
 		Amount:         60000,
 		Created_at:     "2021-09-01",
 		Updated_at:     "2021-09-01",
@@ -36,7 +37,18 @@ func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
 func TestTaxHandler(t *testing.T) {
 	t.Run("Test Income 500000", func(t *testing.T) {
 		e := echo.New()
-		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", nil)
+		MockReq := ReqTax{
+			TotalIncome: 500000.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "donation",
+					Amount:        0.0,
+				},
+			},
+		}
+		reqBody, _ := json.Marshal(MockReq)
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(reqBody))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)

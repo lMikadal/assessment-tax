@@ -87,6 +87,9 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	req.TotalIncome -= personal.Amount
 	for _, v := range tax_rate {
 		rang_now = v.Maximum_salary - v.Minimum_salary
+		if v.Rate != 0 {
+			rang_now += 1
+		}
 		if rang_now > req.TotalIncome {
 			res.Tax += (req.TotalIncome * v.Rate) / 100
 			break
