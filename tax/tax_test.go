@@ -14,8 +14,9 @@ import (
 )
 
 type MockTax struct {
-	db  []DB
-	err error
+	db          []DB
+	dbDeduction DbDeduction
+	err         error
 }
 
 func (m MockTax) TaxByIncome(income uint) ([]DB, error) {
@@ -23,15 +24,7 @@ func (m MockTax) TaxByIncome(income uint) ([]DB, error) {
 }
 
 func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
-	return DbDeduction{
-		ID:             1,
-		Type:           "Personal",
-		Minimum_amount: 10000,
-		Maximum_amount: 100000,
-		Amount:         60000,
-		Created_at:     "2021-09-01",
-		Updated_at:     "2021-09-01",
-	}, nil
+	return m.dbDeduction, nil
 }
 
 func TestTaxHandler(t *testing.T) {
@@ -57,6 +50,15 @@ func TestTaxHandler(t *testing.T) {
 			db: []DB{
 				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
 				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
+			},
+			dbDeduction: DbDeduction{
+				ID:             1,
+				Type:           "Personal",
+				Minimum_amount: 10000,
+				Maximum_amount: 100000,
+				Amount:         60000,
+				Created_at:     "2021-09-01",
+				Updated_at:     "2021-09-01",
 			},
 		}
 
@@ -404,6 +406,15 @@ func TestTaxHandler(t *testing.T) {
 			db: []DB{
 				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
 				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
+			},
+			dbDeduction: DbDeduction{
+				ID:             1,
+				Type:           "Personal",
+				Minimum_amount: 10000,
+				Maximum_amount: 100000,
+				Amount:         60000,
+				Created_at:     "2021-09-01",
+				Updated_at:     "2021-09-01",
 			},
 		}
 

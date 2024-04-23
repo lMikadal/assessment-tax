@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type Allowance struct {
@@ -104,18 +106,34 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		}
 	}
 
-	tax_rate, err := t.info.TaxByIncome(uint(req.TotalIncome))
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
-	}
-	var res ResTax
-	var rang_now float64
 	personal, err := t.info.GetTaxDeducation("Personal")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get personal deduction: %v", err)})
 	}
 
 	req.TotalIncome -= personal.Amount
+
+	tax_rate, err := t.info.TaxByIncome(uint(req.TotalIncome))
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
+	}
+	if len_allowances > 0 {
+		for _, v := range req.Allowances {
+			deduction, err := t.info.GetTaxDeducation(cases.Title(language.English, cases.Compact).String(strings.ToLower(v.AllowanceType)))
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get deduction: %v", err)})
+			}
+			if v.Amount > deduction.Amount {
+				req.TotalIncome -= deduction.Amount
+			} else {
+				req.TotalIncome -= v.Amount
+			}
+		}
+
+	}
+
+	var res ResTax
+	var rang_now float64
 	for _, v := range tax_rate {
 		rang_now = v.Maximum_salary - v.Minimum_salary
 		if v.Rate != 0 {

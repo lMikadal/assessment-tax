@@ -13,7 +13,7 @@ INSERT INTO tax_rates (minimum_salary, maximum_salary, rate) VALUES
 (1000001, 2000000, 20),
 (2000001, NULL, 35);
 
-CREATE TYPE deducation_type AS ENUM ('Personal', 'Donation','K-receipt');
+CREATE TYPE deducation_type AS ENUM ('Personal', 'Donation','K-Receipt');
 
 CREATE TABLE IF NOT EXISTS tax_deductions (
   id SERIAL PRIMARY KEY,
@@ -27,5 +27,5 @@ CREATE TABLE IF NOT EXISTS tax_deductions (
 
 INSERT INTO tax_deductions (type, minimum_amount, maximum_amount, amount) VALUES 
 ('Personal', 10000, 100000, 60000),
-('Donation', 0, 100000, 0),
-('K-receipt', 0, 100000, 50000);
+('Donation', 0, 100000, 100000),
+('K-Receipt', 0, 100000, 50000);
