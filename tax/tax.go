@@ -90,6 +90,9 @@ func (t Tax) TaxHandler(c echo.Context) error {
 			if ok := slices.Contains(allowance_type, allowance_type_low); !ok {
 				return c.JSON(http.StatusBadRequest, Err{Message: "Not found allowanceType"})
 			}
+			if v.Amount < 0 {
+				return c.JSON(http.StatusBadRequest, Err{Message: "Amount must be greater than 0"})
+			}
 			if ok := slices.Contains(have_type, allowance_type_low); ok {
 				return c.JSON(http.StatusBadRequest, Err{Message: "Duplicate allowanceType"})
 			}
