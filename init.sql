@@ -11,7 +11,7 @@ INSERT INTO tax_rates (minimum_salary, maximum_salary, rate) VALUES
 (150001, 500000, 10), --35,000 | 35,000
 (500001, 1000000, 15), -- 75,000 | 110,000
 (1000001, 2000000, 20), -- 200,000 | 310,000
-(2000001, NULL, 35);
+(2000001, 0, 35);
 
 CREATE TYPE deducation_type AS ENUM ('Personal', 'Donation','K-Receipt');
 

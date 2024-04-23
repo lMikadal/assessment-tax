@@ -33,7 +33,7 @@ type ResTaxRefund struct {
 type DB struct {
 	ID             int     `postgres:"id"`
 	Minimum_salary float64 `postgres:"minimum_salary"`
-	Maximum_salary float64 `postgres:"maximum_salary"`
+	Maximum_salary float64 `postgres:"maximum_salary|NULL"`
 	Rate           float64 `postgres:"rate"`
 	Created_at     string  `postgres:"created_at"`
 }
@@ -139,7 +139,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		if v.Rate != 0 {
 			rang_now += 1
 		}
-		if rang_now > req.TotalIncome {
+		if rang_now > req.TotalIncome || v.Maximum_salary == 0 {
 			res.Tax += (req.TotalIncome * v.Rate) / 100
 			break
 		} else {
