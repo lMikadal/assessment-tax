@@ -14,7 +14,6 @@ import (
 )
 
 type MockTax struct {
-	db          []DB
 	dbDeduction []DbDeduction
 	err         error
 }
@@ -58,19 +57,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -110,20 +100,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-				{Minimum_salary: 500001, Maximum_salary: 1000000, Rate: 15},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -163,21 +143,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-				{Minimum_salary: 500001, Maximum_salary: 1000000, Rate: 15},
-				{Minimum_salary: 1000001, Maximum_salary: 2000000, Rate: 20},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -217,22 +186,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-				{Minimum_salary: 500001, Maximum_salary: 1000000, Rate: 15},
-				{Minimum_salary: 1000001, Maximum_salary: 2000000, Rate: 20},
-				{Minimum_salary: 2000001, Maximum_salary: 0, Rate: 35},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -271,9 +228,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -313,9 +268,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -355,9 +308,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -397,9 +348,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -447,9 +396,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -493,9 +440,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -535,9 +480,7 @@ func TestTaxHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
-		mock := MockTax{
-			db: []DB{},
-		}
+		mock := MockTax{}
 
 		handler := New(&mock)
 		handler.TaxHandler(c)
@@ -578,19 +521,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -630,19 +564,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 			},
 		}
@@ -682,19 +607,10 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 				{
 					ID:             1,
@@ -768,28 +684,14 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 				{
-					ID:             1,
-					Type:           "Donation",
-					Minimum_amount: 0,
-					Maximum_amount: 100000,
-					Amount:         100000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Donation",
+					Amount: 100000,
 				},
 			},
 		}
@@ -829,28 +731,14 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 				{
-					ID:             1,
-					Type:           "K-Receipt",
-					Minimum_amount: 0,
-					Maximum_amount: 100000,
-					Amount:         50000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "K-Receipt",
+					Amount: 50000,
 				},
 			},
 		}
@@ -890,28 +778,14 @@ func TestTaxHandler(t *testing.T) {
 		c := e.NewContext(req, rec)
 
 		mock := MockTax{
-			db: []DB{
-				{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
-				{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
-			},
 			dbDeduction: []DbDeduction{
 				{
-					ID:             1,
-					Type:           "Personal",
-					Minimum_amount: 10000,
-					Maximum_amount: 100000,
-					Amount:         60000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "Personal",
+					Amount: 60000,
 				},
 				{
-					ID:             1,
-					Type:           "K-Receipt",
-					Minimum_amount: 0,
-					Maximum_amount: 100000,
-					Amount:         50000,
-					Created_at:     "2021-09-01",
-					Updated_at:     "2021-09-01",
+					Type:   "K-Receipt",
+					Amount: 50000,
 				},
 			},
 		}
