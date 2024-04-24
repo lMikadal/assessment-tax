@@ -9,6 +9,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 type Allowance struct {
@@ -123,11 +124,6 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	}
 
 	req.TotalIncome -= personal.Amount
-
-	tax_rate, err := t.info.GetTax()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
-	}
 	if len_allowances > 0 {
 		for _, v := range req.Allowances {
 			deduction, err := t.info.GetTaxDeducationByType(cases.Title(language.English, cases.Compact).String(strings.ToLower(v.AllowanceType)))
@@ -143,20 +139,32 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 	}
 
+	tax_rate, err := t.info.GetTax()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
+	}
 	var res ResTaxLevel
 	var rang_now float64
+	var cal float64
 	for _, v := range tax_rate {
 		rang_now = v.Maximum_salary - v.Minimum_salary
 		if v.Rate != 0 {
 			rang_now += 1
 		}
-		if rang_now > req.TotalIncome || v.Maximum_salary == 0 {
-			res.Tax += t.calculateTax(req.TotalIncome, v, &res.TaxLevel)
-			break
+
+		if req.TotalIncome <= 0 {
+			cal = 0
 		} else {
-			res.Tax += t.calculateTax(rang_now, v, &res.TaxLevel)
+			if rang_now > req.TotalIncome || v.Maximum_salary == 0 {
+				cal = t.calculateTax(req.TotalIncome, v)
+			} else {
+				cal = t.calculateTax(rang_now, v)
+			}
+			res.Tax += cal
 			req.TotalIncome -= rang_now
 		}
+
+		t.addTaxLevel(&res.TaxLevel, v, cal)
 	}
 
 	res.Tax -= req.Wht
@@ -167,12 +175,24 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
-func (t Tax) calculateTax(income float64, rate DB, level *[]TaxLevel) float64 {
+func (t Tax) calculateTax(income float64, rate DB) float64 {
 	cal := (income * rate.Rate) / 100
-	*level = append(*level, TaxLevel{
-		Level: fmt.Sprintf("%.0f-%.0f", rate.Minimum_salary, rate.Maximum_salary),
-		Tax:   cal,
-	})
 
 	return cal
+}
+
+func (t Tax) addTaxLevel(level *[]TaxLevel, rate DB, cal float64) {
+	var format string
+	newP := message.NewPrinter(language.English)
+	if rate.Maximum_salary != 0 {
+		format = newP.Sprintf("%d-%d", int(rate.Minimum_salary), int(rate.Maximum_salary))
+	} else {
+		format = newP.Sprintf("%d ขึ้นไป", int(rate.Minimum_salary))
+
+	}
+
+	*level = append(*level, TaxLevel{
+		Level: format,
+		Tax:   cal,
+	})
 }
