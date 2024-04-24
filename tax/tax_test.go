@@ -19,10 +19,6 @@ type MockTax struct {
 	err         error
 }
 
-func (m MockTax) TaxByIncome(income uint) ([]DB, error) {
-	return m.db, m.err
-}
-
 func (m MockTax) GetTax() ([]DB, error) {
 	return []DB{
 		{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
@@ -33,7 +29,7 @@ func (m MockTax) GetTax() ([]DB, error) {
 	}, m.err
 }
 
-func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
+func (m MockTax) GetTaxDeducationByType(deducation_type string) (DbDeduction, error) {
 	for _, v := range m.dbDeduction {
 		if v.Type == deducation_type {
 			return v, nil

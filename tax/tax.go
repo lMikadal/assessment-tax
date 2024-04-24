@@ -68,9 +68,8 @@ type Err struct {
 }
 
 type InfoTax interface {
-	TaxByIncome(income uint) ([]DB, error)
 	GetTax() ([]DB, error)
-	GetTaxDeducation(deducation_type string) (DbDeduction, error)
+	GetTaxDeducationByType(deducation_type string) (DbDeduction, error)
 }
 
 func New(info InfoTax) Tax {
@@ -118,7 +117,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		}
 	}
 
-	personal, err := t.info.GetTaxDeducation("Personal")
+	personal, err := t.info.GetTaxDeducationByType("Personal")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get personal deduction: %v", err)})
 	}
@@ -131,7 +130,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	}
 	if len_allowances > 0 {
 		for _, v := range req.Allowances {
-			deduction, err := t.info.GetTaxDeducation(cases.Title(language.English, cases.Compact).String(strings.ToLower(v.AllowanceType)))
+			deduction, err := t.info.GetTaxDeducationByType(cases.Title(language.English, cases.Compact).String(strings.ToLower(v.AllowanceType)))
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get deduction: %v", err)})
 			}
