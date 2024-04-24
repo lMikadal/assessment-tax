@@ -34,7 +34,7 @@ func (m MockTax) GetTaxDeducationByType(deducation_type string) (DbDeduction, er
 			return v, nil
 		}
 	}
-	return DbDeduction{}, nil
+	return DbDeduction{}, m.err
 }
 
 func TestTaxHandler(t *testing.T) {
