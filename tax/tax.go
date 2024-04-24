@@ -136,7 +136,6 @@ func (t Tax) TaxHandler(c echo.Context) error {
 				req.TotalIncome -= v.Amount
 			}
 		}
-
 	}
 
 	tax_rate, err := t.info.GetTax()
@@ -169,7 +168,8 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 	res.Tax -= req.Wht
 	if res.Tax < 0 {
-		return c.JSON(http.StatusOK, ResTaxRefund{TaxRefund: res.Tax * -1})
+		res.TaxRefund = res.Tax * -1
+		res.Tax = 0
 	}
 
 	return c.JSON(http.StatusOK, res)

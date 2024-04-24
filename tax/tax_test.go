@@ -68,10 +68,35 @@ func TestTaxHandler(t *testing.T) {
 		handler := New(&mock)
 		handler.TaxHandler(c)
 
-		want := ResTax{Tax: 29000.0}
+		want := ResTaxLevel{
+			Tax:       29000.0,
+			TaxRefund: 0.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   29000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   0.0,
+				},
+			},
+		}
 		gotJson := rec.Body.Bytes()
 
-		var got ResTax
+		var got ResTaxLevel
 		if err := json.Unmarshal(gotJson, &got); err != nil {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
@@ -111,10 +136,35 @@ func TestTaxHandler(t *testing.T) {
 		handler := New(&mock)
 		handler.TaxHandler(c)
 
-		want := ResTax{Tax: 101000.0}
+		want := ResTaxLevel{
+			Tax:       101000.0,
+			TaxRefund: 0.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   35000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   66000.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   0.0,
+				},
+			},
+		}
 		gotJson := rec.Body.Bytes()
 
-		var got ResTax
+		var got ResTaxLevel
 		if err := json.Unmarshal(gotJson, &got); err != nil {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
@@ -154,10 +204,35 @@ func TestTaxHandler(t *testing.T) {
 		handler := New(&mock)
 		handler.TaxHandler(c)
 
-		want := ResTax{Tax: 298000.0}
+		want := ResTaxLevel{
+			Tax:       298000.0,
+			TaxRefund: 0.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   35000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   75000.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   188000.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   0.0,
+				},
+			},
+		}
 		gotJson := rec.Body.Bytes()
 
-		var got ResTax
+		var got ResTaxLevel
 		if err := json.Unmarshal(gotJson, &got); err != nil {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
@@ -197,10 +272,35 @@ func TestTaxHandler(t *testing.T) {
 		handler := New(&mock)
 		handler.TaxHandler(c)
 
-		want := ResTax{Tax: 639000.0}
+		want := ResTaxLevel{
+			Tax:       639000.0,
+			TaxRefund: 0.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   35000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   75000.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   200000.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   329000.0,
+				},
+			},
+		}
 		gotJson := rec.Body.Bytes()
 
-		var got ResTax
+		var got ResTaxLevel
 		if err := json.Unmarshal(gotJson, &got); err != nil {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
@@ -532,10 +632,35 @@ func TestTaxHandler(t *testing.T) {
 		handler := New(&mock)
 		handler.TaxHandler(c)
 
-		want := ResTaxRefund{TaxRefund: 1000.0}
+		want := ResTaxLevel{
+			Tax:       0.0,
+			TaxRefund: 1000.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   29000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   0.0,
+				},
+			},
+		}
 		gotJson := rec.Body.Bytes()
 
-		var got ResTaxRefund
+		var got ResTaxLevel
 		if err := json.Unmarshal(gotJson, &got); err != nil {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
