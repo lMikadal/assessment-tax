@@ -30,6 +30,16 @@ type ResTaxRefund struct {
 	TaxRefund float64 `json:"taxRefund"`
 }
 
+type TaxLevel struct {
+	Level string  `json:"level"`
+	Tax   float64 `json:"tax"`
+}
+
+type ResTaxLevel struct {
+	Tax      float64 `json:"tax"`
+	TaxLevel []TaxLevel
+}
+
 type DB struct {
 	ID             int     `postgres:"id"`
 	Minimum_salary float64 `postgres:"minimum_salary"`
