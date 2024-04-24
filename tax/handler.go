@@ -3,7 +3,6 @@ package tax
 import (
 	"fmt"
 	"net/http"
-	"slices"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -17,37 +16,8 @@ func (t Tax) TaxHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: "invalid request"})
 	}
 
-	if req.TotalIncome <= 0 {
-		return c.JSON(http.StatusBadRequest, Err{Message: "totalIncome must be greater than 0"})
-	}
-
-	if req.Wht < 0 {
-		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be greater than 0"})
-	}
-
-	if req.Wht > req.TotalIncome {
-		return c.JSON(http.StatusBadRequest, Err{Message: "Wht must be less than totalIncome"})
-	}
-
-	len_allowances := len(req.Allowances)
-	if len_allowances > 2 {
-		return c.JSON(http.StatusBadRequest, Err{Message: "Allowances must be less than or equal to 2"})
-	} else if len_allowances > 0 {
-		allowance_type := []string{"donation", "k-receipt"}
-		have_type := []string{}
-		for _, v := range req.Allowances {
-			allowance_type_low := strings.ToLower(v.AllowanceType)
-			if ok := slices.Contains(allowance_type, allowance_type_low); !ok {
-				return c.JSON(http.StatusBadRequest, Err{Message: "Not found allowanceType"})
-			}
-			if v.Amount < 0 {
-				return c.JSON(http.StatusBadRequest, Err{Message: "Amount must be greater than 0"})
-			}
-			if ok := slices.Contains(have_type, allowance_type_low); ok {
-				return c.JSON(http.StatusBadRequest, Err{Message: "Duplicate allowanceType"})
-			}
-			have_type = append(have_type, allowance_type_low)
-		}
+	if ok, err := t.validateReq(req); !ok {
+		return c.JSON(http.StatusBadRequest, err)
 	}
 
 	personal, err := t.info.GetTaxDeducationByType("Personal")
@@ -56,7 +26,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	}
 
 	req.TotalIncome -= personal.Amount
-	if len_allowances > 0 {
+	if len(req.Allowances) > 0 {
 		for _, v := range req.Allowances {
 			deduction, err := t.info.GetTaxDeducationByType(cases.Title(language.English, cases.Compact).String(strings.ToLower(v.AllowanceType)))
 			if err != nil {

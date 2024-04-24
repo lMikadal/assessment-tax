@@ -19,8 +19,8 @@ func main() {
 		panic(err)
 	}
 
-	e := echo.New()
 	handler := tax.New(db)
+	e := echo.New()
 	e.POST("/tax/calculations", handler.TaxHandler)
 	e.POST("/admin/deductions/personal", handler.TaxDeducateHandler)
 
