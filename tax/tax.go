@@ -36,8 +36,9 @@ type TaxLevel struct {
 }
 
 type ResTaxLevel struct {
-	Tax      float64 `json:"tax"`
-	TaxLevel []TaxLevel
+	Tax       float64 `json:"tax"`
+	TaxRefund float64 `json:"taxRefund"`
+	TaxLevel  []TaxLevel
 }
 
 type DB struct {
@@ -68,6 +69,7 @@ type Err struct {
 
 type InfoTax interface {
 	TaxByIncome(income uint) ([]DB, error)
+	GetTax() ([]DB, error)
 	GetTaxDeducation(deducation_type string) (DbDeduction, error)
 }
 
@@ -123,7 +125,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 	req.TotalIncome -= personal.Amount
 
-	tax_rate, err := t.info.TaxByIncome(uint(req.TotalIncome))
+	tax_rate, err := t.info.GetTax()
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
 	}
@@ -142,7 +144,7 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 	}
 
-	var res ResTax
+	var res ResTaxLevel
 	var rang_now float64
 	for _, v := range tax_rate {
 		rang_now = v.Maximum_salary - v.Minimum_salary
@@ -150,10 +152,10 @@ func (t Tax) TaxHandler(c echo.Context) error {
 			rang_now += 1
 		}
 		if rang_now > req.TotalIncome || v.Maximum_salary == 0 {
-			res.Tax += (req.TotalIncome * v.Rate) / 100
+			res.Tax += t.calculateTax(req.TotalIncome, v, &res.TaxLevel)
 			break
 		} else {
-			res.Tax += (rang_now * v.Rate) / 100
+			res.Tax += t.calculateTax(rang_now, v, &res.TaxLevel)
 			req.TotalIncome -= rang_now
 		}
 	}
@@ -164,4 +166,14 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, res)
+}
+
+func (t Tax) calculateTax(income float64, rate DB, level *[]TaxLevel) float64 {
+	cal := (income * rate.Rate) / 100
+	*level = append(*level, TaxLevel{
+		Level: fmt.Sprintf("%.0f-%.0f", rate.Minimum_salary, rate.Maximum_salary),
+		Tax:   cal,
+	})
+
+	return cal
 }

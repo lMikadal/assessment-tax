@@ -23,6 +23,16 @@ func (m MockTax) TaxByIncome(income uint) ([]DB, error) {
 	return m.db, m.err
 }
 
+func (m MockTax) GetTax() ([]DB, error) {
+	return []DB{
+		{Minimum_salary: 0, Maximum_salary: 150000, Rate: 0},
+		{Minimum_salary: 150001, Maximum_salary: 500000, Rate: 10},
+		{Minimum_salary: 500001, Maximum_salary: 1000000, Rate: 15},
+		{Minimum_salary: 1000001, Maximum_salary: 2000000, Rate: 20},
+		{Minimum_salary: 2000001, Maximum_salary: 0, Rate: 35},
+	}, m.err
+}
+
 func (m MockTax) GetTaxDeducation(deducation_type string) (DbDeduction, error) {
 	for _, v := range m.dbDeduction {
 		if v.Type == deducation_type {
@@ -706,7 +716,8 @@ func TestTaxHandler(t *testing.T) {
 		handler.TaxHandler(c)
 
 		want := ResTaxLevel{
-			Tax: 19000.0,
+			Tax:       19000.0,
+			TaxRefund: 0.0,
 			TaxLevel: []TaxLevel{
 				{
 					Level: "0-150,000",
