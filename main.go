@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"net/http"
 	"os"
 	"os/signal"
@@ -11,6 +12,7 @@ import (
 	"github.com/lMikadal/assessment-tax/postgres"
 	"github.com/lMikadal/assessment-tax/tax"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
@@ -22,7 +24,16 @@ func main() {
 	handler := tax.New(db)
 	e := echo.New()
 	e.POST("/tax/calculations", handler.TaxHandler)
-	e.POST("/admin/deductions/personal", handler.TaxDeducateHandler)
+
+	a := e.Group("/admin")
+	a.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		if subtle.ConstantTimeCompare([]byte(username), []byte(os.Getenv("ADMIN_USERNAME"))) == 1 && subtle.ConstantTimeCompare([]byte(password), []byte(os.Getenv("ADMIN_PASSWORD"))) == 1 {
+			return true, nil
+		}
+
+		return false, nil
+	}))
+	a.POST("/deductions/personal", handler.TaxDeducateHandler)
 
 	// Start server
 	go func() {
