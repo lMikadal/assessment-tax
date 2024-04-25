@@ -22,6 +22,14 @@ type ResTaxLevel struct {
 	TaxLevel  []TaxLevel
 }
 
+type ReqAmount struct {
+	Amount float64 `json:"amount"`
+}
+
+type ResDeduction struct {
+	PersonalDeduction float64 `json:"personalDeduction"`
+}
+
 type DB struct {
 	ID             int     `postgres:"id"`
 	Minimum_salary float64 `postgres:"minimum_salary"`

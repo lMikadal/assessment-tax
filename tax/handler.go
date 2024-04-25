@@ -78,5 +78,20 @@ func (t Tax) TaxHandler(c echo.Context) error {
 }
 
 func (t Tax) TaxDeducateHandler(c echo.Context) error {
+	var req ReqAmount
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: "invalid request"})
+	}
+
+	personal, err := t.info.GetTaxDeducationByType("Personal")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get personal deduction: %v", err)})
+	}
+	if req.Amount > personal.Maximum_amount {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Amount should be less than 100,000"})
+	} else if req.Amount < personal.Minimum_amount {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Amount should be more than 10,000"})
+	}
+
 	return c.JSON(http.StatusOK, Err{Message: "For test only"})
 }
