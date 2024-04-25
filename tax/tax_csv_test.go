@@ -1,0 +1,81 @@
+//go:build unit
+
+package tax
+
+import (
+	"bytes"
+	"encoding/csv"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
+	"testing"
+
+	"github.com/labstack/echo/v4"
+)
+
+func TestCsvHander(t *testing.T) {
+	t.Run("Test normal story6", func(t *testing.T) {
+		e := echo.New()
+
+		body := new(bytes.Buffer)
+		writer := csv.NewWriter(body)
+		writer.Write([]string{"totalIncome", "wht", "donation"})
+		writer.Write([]string{"500000", "0", "0"})
+		writer.Write([]string{"600000", "40000", "20000"})
+		writer.Write([]string{"750000", "50000", "15000"})
+		writer.Flush()
+
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations/upload-csv", body)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		mock := MockTax{
+			dbDeduction: []DbDeduction{
+				{
+					Type:   "Personal",
+					Amount: 60000,
+				},
+				{
+					Type:   "Donation",
+					Amount: 100000,
+				},
+			},
+		}
+
+		handler := New(&mock)
+		handler.UploadCSVHandler(c)
+
+		want := ResAllCsv{
+			Taxes: []ResCsvTax{
+				{
+					TotalIncome: 500000.0,
+					Tax:         29000.0,
+				},
+				{
+					TotalIncome: 600000.0,
+					TaxRefund:   2000.0,
+				},
+				{
+					TotalIncome: 750000.0,
+					TaxRefund:   11250.0,
+				},
+			},
+		}
+		gotJson := rec.Body.Bytes()
+
+		var got ResAllCsv
+		if err := json.Unmarshal(gotJson, &got); err != nil {
+			t.Errorf("failed to unmarshal json: %v", err)
+		}
+
+		if rec.Code != http.StatusBadRequest {
+			t.Errorf("got: %v, want: %v", rec.Code, http.StatusBadRequest)
+		}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
+}

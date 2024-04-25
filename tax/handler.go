@@ -1,7 +1,9 @@
 package tax
 
 import (
+	"encoding/csv"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 
@@ -78,7 +80,24 @@ func (t Tax) TaxHandler(c echo.Context) error {
 }
 
 func (t Tax) UploadCSVHandler(c echo.Context) error {
-	return c.JSON(http.StatusOK, Err{Message: "test upload csv"})
+	reader := csv.NewReader(c.Request().Body)
+	// var results [][]string
+	for {
+		// read one row from csv
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		// add record to result set
+		// results = append(results, record)
+		fmt.Println(record)
+	}
+
+	return c.JSON(http.StatusOK, Err{Message: "reader"})
 }
 
 func (t Tax) TaxDeducateHandler(c echo.Context) error {

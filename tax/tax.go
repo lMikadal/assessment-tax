@@ -30,6 +30,16 @@ type ResPersonalDeduction struct {
 	PersonalDeduction float64 `json:"personalDeduction"`
 }
 
+type ResCsvTax struct {
+	TotalIncome float64 `json:"totalIncome"`
+	Tax         float64 `json:"tax"`
+	TaxRefund   float64 `json:"taxRefund"`
+}
+
+type ResAllCsv struct {
+	Taxes []ResCsvTax `json:"taxes"`
+}
+
 type DB struct {
 	ID             int     `postgres:"id"`
 	Minimum_salary float64 `postgres:"minimum_salary"`
