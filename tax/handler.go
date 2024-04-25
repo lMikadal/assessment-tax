@@ -93,5 +93,9 @@ func (t Tax) TaxDeducateHandler(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, Err{Message: "Amount should be more than 10,000"})
 	}
 
-	return c.JSON(http.StatusOK, Err{Message: "For test only"})
+	if ok := t.info.SetTaxDeducationByType("Personal", req.Amount); ok != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to set personal deduction: %v", ok)})
+	}
+
+	return c.JSON(http.StatusOK, ResPersonalDeduction{PersonalDeduction: req.Amount})
 }

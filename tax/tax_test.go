@@ -37,6 +37,10 @@ func (m MockTax) GetTaxDeducationByType(deducation_type string) (DbDeduction, er
 	return DbDeduction{}, m.err
 }
 
+func (m MockTax) SetTaxDeducationByType(deducation_type string, amount float64) error {
+	return m.err
+}
+
 func TestTaxHandler(t *testing.T) {
 	t.Run("Test Income 500000", func(t *testing.T) {
 		e := echo.New()

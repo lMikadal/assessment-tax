@@ -26,7 +26,7 @@ type ReqAmount struct {
 	Amount float64 `json:"amount"`
 }
 
-type ResDeduction struct {
+type ResPersonalDeduction struct {
 	PersonalDeduction float64 `json:"personalDeduction"`
 }
 
@@ -59,6 +59,7 @@ type Err struct {
 type InfoTax interface {
 	GetTax() ([]DB, error)
 	GetTaxDeducationByType(deducation_type string) (DbDeduction, error)
+	SetTaxDeducationByType(deducation_type string, amount float64) error
 }
 
 func New(info InfoTax) Tax {

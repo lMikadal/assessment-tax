@@ -39,3 +39,12 @@ func (p *Postgres) GetTaxDeducationByType(deducation_type string) (tax.DbDeducti
 
 	return tax_deduction, nil
 }
+
+func (p *Postgres) SetTaxDeducationByType(deducation_type string, amount float64) error {
+	_, err := p.Db.Exec("UPDATE tax_deductions SET amount = $1 WHERE type = $2", amount, deducation_type)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
