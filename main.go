@@ -24,6 +24,7 @@ func main() {
 	handler := tax.New(db)
 	e := echo.New()
 	e.POST("/tax/calculations", handler.TaxHandler)
+	e.POST("tax/calculations/upload-csv", handler.UploadCSVHandler)
 
 	a := e.Group("/admin")
 	a.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {

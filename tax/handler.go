@@ -77,6 +77,10 @@ func (t Tax) TaxHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, res)
 }
 
+func (t Tax) UploadCSVHandler(c echo.Context) error {
+	return c.JSON(http.StatusOK, Err{Message: "test upload csv"})
+}
+
 func (t Tax) TaxDeducateHandler(c echo.Context) error {
 	var req ReqAmount
 	if err := c.Bind(&req); err != nil {
