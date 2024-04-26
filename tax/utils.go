@@ -89,6 +89,9 @@ func (t Tax) validateCsv(head []string) (map[string]int, map[string]float64, Err
 			deducate[v] = d.Amount
 		}
 	}
+	if _, ok := position["totalIncome"]; !ok {
+		return make(map[string]int), make(map[string]float64), Err{Message: "invalid csv have not totalIncome"}
+	}
 
 	personal, err := t.info.GetTaxDeducationByType("Personal")
 	if err != nil {

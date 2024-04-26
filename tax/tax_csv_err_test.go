@@ -106,4 +106,50 @@ func TestCsvErrorHander(t *testing.T) {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})
+
+	t.Run("Test not have totalIncome", func(t *testing.T) {
+		e := echo.New()
+
+		body := new(bytes.Buffer)
+		writer := csv.NewWriter(body)
+		writer.Write([]string{"wht"})
+		writer.Flush()
+
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations/upload-csv", body)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		mock := MockTax{
+			dbDeduction: []DbDeduction{
+				{
+					Type:   "Personal",
+					Amount: 60000,
+				},
+				{
+					Type:   "Donation",
+					Amount: 100000,
+				},
+			},
+		}
+
+		handler := New(&mock)
+		handler.UploadCSVHandler(c)
+
+		want := Err{Message: "invalid csv have not totalIncome"}
+		gotJson := rec.Body.Bytes()
+
+		var got Err
+		if err := json.Unmarshal(gotJson, &got); err != nil {
+			t.Errorf("failed to unmarshal json: %v", err)
+		}
+
+		if rec.Code != http.StatusBadRequest {
+			t.Errorf("got: %v, want: %v", rec.Code, http.StatusBadRequest)
+		}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
 }
