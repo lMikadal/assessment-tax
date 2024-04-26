@@ -90,6 +90,9 @@ func (t Tax) UploadCSVHandler(c echo.Context) error {
 	if msg.Message != "" {
 		return c.JSON(http.StatusBadRequest, msg)
 	}
+	if len(read) <= 1 {
+		return c.JSON(http.StatusBadRequest, Err{Message: "invalid csv have not value"})
+	}
 	income := 0.0
 	wht := 0.0
 	res_all_csv := ResAllCsv{}
@@ -98,7 +101,7 @@ func (t Tax) UploadCSVHandler(c echo.Context) error {
 		if _, ok := position["totalIncome"]; ok {
 			income, err = strconv.ParseFloat(v[position["totalIncome"]], 64)
 			if err != nil {
-				return c.JSON(http.StatusBadRequest, Err{Message: "invalid totalIncome"})
+				return c.JSON(http.StatusBadRequest, Err{Message: "invalid field totalIncome"})
 			}
 		}
 		res_csv.TotalIncome = income
