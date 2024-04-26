@@ -142,7 +142,7 @@ func (t Tax) UploadCSVHandler(c echo.Context) error {
 		if _, ok := position["wht"]; ok {
 			wht, err = strconv.ParseFloat(v[position["wht"]], 64)
 			if err != nil {
-				return c.JSON(http.StatusBadRequest, Err{Message: "invalid totalIncome"})
+				return c.JSON(http.StatusBadRequest, Err{Message: "invalid field wht"})
 			}
 		}
 		res_csv.Tax -= wht

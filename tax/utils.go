@@ -106,7 +106,7 @@ func (t Tax) calDeducation(p map[string]int, name_p string, str []string, deduca
 	if _, ok := p[name_p]; ok {
 		dedu, err := strconv.ParseFloat(str[p[name_p]], 64)
 		if err != nil {
-			return 0.0, Err{Message: "invalid donation"}
+			return 0.0, Err{Message: "invalid field " + name_p}
 		}
 		if dedu > deducate[name_p] {
 			return deducate[name_p], Err{}
