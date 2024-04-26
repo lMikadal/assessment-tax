@@ -206,4 +206,68 @@ func TestCsvHander(t *testing.T) {
 			t.Errorf("got: %v, want: %v", got, want)
 		}
 	})
+
+	t.Run("Test change position", func(t *testing.T) {
+		e := echo.New()
+
+		body := new(bytes.Buffer)
+		writer := csv.NewWriter(body)
+		writer.Write([]string{"totalIncome", "donation", "wht"})
+		writer.Write([]string{"1000000", "0", "0"})
+		writer.Write([]string{"500000", "0", "25000"})
+		writer.Write([]string{"500000", "200000", "0"})
+		writer.Flush()
+
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations/upload-csv", body)
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		mock := MockTax{
+			dbDeduction: []DbDeduction{
+				{
+					Type:   "Personal",
+					Amount: 60000,
+				},
+				{
+					Type:   "Donation",
+					Amount: 100000,
+				},
+			},
+		}
+
+		handler := New(&mock)
+		handler.UploadCSVHandler(c)
+
+		want := ResAllCsv{
+			Taxes: []ResCsvTax{
+				{
+					TotalIncome: 1000000.0,
+					Tax:         101000.0,
+				},
+				{
+					TotalIncome: 500000.0,
+					Tax:         4000.0,
+				},
+				{
+					TotalIncome: 500000.0,
+					Tax:         19000.0,
+				},
+			},
+		}
+		gotJson := rec.Body.Bytes()
+
+		var got ResAllCsv
+		if err := json.Unmarshal(gotJson, &got); err != nil {
+			t.Errorf("failed to unmarshal json: %v", err)
+		}
+
+		if rec.Code != http.StatusOK {
+			t.Errorf("got: %v, want: %v", rec.Code, http.StatusOK)
+		}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
 }
