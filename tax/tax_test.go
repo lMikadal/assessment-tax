@@ -743,4 +743,83 @@ func TestTaxHandler(t *testing.T) {
 		}
 	})
 
+	t.Run("Test case stroy 6", func(t *testing.T) {
+		e := echo.New()
+		MockReq := ReqTax{
+			TotalIncome: 500000.0,
+			Wht:         0.0,
+			Allowances: []Allowance{
+				{
+					AllowanceType: "k-receipt",
+					Amount:        200000.0,
+				},
+				{
+					AllowanceType: "donation",
+					Amount:        100000.0,
+				},
+			},
+		}
+		reqBody, _ := json.Marshal(MockReq)
+		req := httptest.NewRequest(http.MethodPost, "/tax/calculations", bytes.NewBuffer(reqBody))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		mock := MockTax{
+			dbDeduction: []DbDeduction{
+				{
+					Type:   "Personal",
+					Amount: 60000,
+				},
+				{
+					Type:   "K-Receipt",
+					Amount: 50000,
+				},
+				{
+					Type:   "Donation",
+					Amount: 100000,
+				},
+			},
+		}
+
+		handler := New(&mock)
+		handler.TaxHandler(c)
+
+		want := ResTaxLevel{
+			Tax:       14000.0,
+			TaxRefund: 0.0,
+			TaxLevel: []TaxLevel{
+				{
+					Level: "0-150,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "150,001-500,000",
+					Tax:   14000.0,
+				},
+				{
+					Level: "500,001-1,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "1,000,001-2,000,000",
+					Tax:   0.0,
+				},
+				{
+					Level: "2,000,001 ขึ้นไป",
+					Tax:   0.0,
+				},
+			},
+		}
+		gotJson := rec.Body.Bytes()
+
+		var got ResTaxLevel
+		if err := json.Unmarshal(gotJson, &got); err != nil {
+			t.Errorf("failed to unmarshal json: %v", err)
+		}
+
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got: %v, want: %v", got, want)
+		}
+	})
 }
