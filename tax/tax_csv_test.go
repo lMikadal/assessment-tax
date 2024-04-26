@@ -59,7 +59,7 @@ func TestCsvHander(t *testing.T) {
 				},
 				{
 					TotalIncome: 750000.0,
-					TaxRefund:   11250.0,
+					Tax:         11250.0,
 				},
 			},
 		}
@@ -70,8 +70,8 @@ func TestCsvHander(t *testing.T) {
 			t.Errorf("failed to unmarshal json: %v", err)
 		}
 
-		if rec.Code != http.StatusBadRequest {
-			t.Errorf("got: %v, want: %v", rec.Code, http.StatusBadRequest)
+		if rec.Code != http.StatusOK {
+			t.Errorf("got: %v, want: %v", rec.Code, http.StatusOK)
 		}
 
 		if !reflect.DeepEqual(got, want) {

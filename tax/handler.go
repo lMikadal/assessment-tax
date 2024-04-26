@@ -3,8 +3,8 @@ package tax
 import (
 	"encoding/csv"
 	"fmt"
-	"io"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -81,23 +81,76 @@ func (t Tax) TaxHandler(c echo.Context) error {
 
 func (t Tax) UploadCSVHandler(c echo.Context) error {
 	reader := csv.NewReader(c.Request().Body)
-	// var results [][]string
-	for {
-		// read one row from csv
-		record, err := reader.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return err
-		}
-
-		// add record to result set
-		// results = append(results, record)
-		fmt.Println(record)
+	read, err := reader.ReadAll()
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: "failed to read csv"})
 	}
 
-	return c.JSON(http.StatusOK, Err{Message: "reader"})
+	position, deducate, msg := t.validateCsv(read[0])
+	if msg.Message != "" {
+		return c.JSON(http.StatusBadRequest, msg)
+	}
+	income := 0.0
+	wht := 0.0
+	res_all_csv := ResAllCsv{}
+	for _, v := range read[1:] {
+		res_csv := ResCsvTax{}
+		if _, ok := position["totalIncome"]; ok {
+			income, err = strconv.ParseFloat(v[position["totalIncome"]], 64)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, Err{Message: "invalid totalIncome"})
+			}
+		}
+		res_csv.TotalIncome = income
+		income -= deducate["personal"]
+		for _, de := range []string{"donation", "k-receipt"} {
+			cal, err := t.calDeducation(position, de, v, deducate)
+			if err.Message != "" {
+				return c.JSON(http.StatusBadRequest, err)
+			}
+			income -= cal
+		}
+
+		tax_rate, err := t.info.GetTax()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get tax rate: %v", err)})
+		}
+
+		var rang_now float64
+		var cal float64
+		for _, tr := range tax_rate {
+			rang_now = tr.Maximum_salary - tr.Minimum_salary
+			if tr.Rate != 0 {
+				rang_now += 1
+			}
+
+			if income <= 0 {
+				cal = 0
+			} else {
+				if rang_now > income || tr.Maximum_salary == 0 {
+					cal = t.calculateTax(income, tr)
+				} else {
+					cal = t.calculateTax(rang_now, tr)
+				}
+				res_csv.Tax += cal
+				income -= rang_now
+			}
+		}
+		if _, ok := position["wht"]; ok {
+			wht, err = strconv.ParseFloat(v[position["wht"]], 64)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, Err{Message: "invalid totalIncome"})
+			}
+		}
+		res_csv.Tax -= wht
+		if res_csv.Tax < 0 {
+			res_csv.TaxRefund = res_csv.Tax * -1
+			res_csv.Tax = 0
+		}
+		res_all_csv.Taxes = append(res_all_csv.Taxes, res_csv)
+	}
+
+	return c.JSON(http.StatusOK, res_all_csv)
 }
 
 func (t Tax) TaxDeducateHandler(c echo.Context) error {

@@ -2,8 +2,10 @@ package tax
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 
+	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
@@ -65,4 +67,50 @@ func (t Tax) addTaxLevel(level *[]TaxLevel, rate DB, cal float64) {
 		Level: format,
 		Tax:   cal,
 	})
+}
+
+func (t Tax) validateCsv(head []string) (map[string]int, map[string]float64, Err) {
+	simple := []string{"totalIncome", "wht", "donation", "k-receipt"}
+	position := make(map[string]int)
+	deducate := make(map[string]float64)
+
+	for i, v := range head {
+		if _, ok := position[v]; !ok && slices.Contains(simple, v) {
+			position[v] = i
+		} else {
+			return make(map[string]int), make(map[string]float64), Err{Message: "invalid csv"}
+		}
+
+		if v == "donation" || v == "k-receipt" {
+			d, err := t.info.GetTaxDeducationByType(cases.Title(language.English, cases.Compact).String(strings.ToLower(v)))
+			if err != nil {
+				return make(map[string]int), make(map[string]float64), Err{Message: "failed to get deduction"}
+			}
+			deducate[v] = d.Amount
+		}
+	}
+
+	personal, err := t.info.GetTaxDeducationByType("Personal")
+	if err != nil {
+		return make(map[string]int), make(map[string]float64), Err{Message: "failed to get deduction"}
+	}
+	deducate["personal"] = personal.Amount
+
+	return position, deducate, Err{}
+}
+
+func (t Tax) calDeducation(p map[string]int, name_p string, str []string, deducate map[string]float64) (float64, Err) {
+	if _, ok := p[name_p]; ok {
+		dedu, err := strconv.ParseFloat(str[p[name_p]], 64)
+		if err != nil {
+			return 0.0, Err{Message: "invalid donation"}
+		}
+		if dedu > deducate[name_p] {
+			return deducate[name_p], Err{}
+		} else {
+			return dedu, Err{}
+		}
+	}
+
+	return 0.0, Err{}
 }
