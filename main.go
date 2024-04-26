@@ -35,6 +35,7 @@ func main() {
 		return false, nil
 	}))
 	a.POST("/deductions/personal", handler.TaxDeducateHandler)
+	a.POST("/deductions/k-receipt", handler.TaxDeducateKreceiptHandler)
 
 	// Start server
 	go func() {

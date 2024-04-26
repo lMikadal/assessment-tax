@@ -178,3 +178,26 @@ func (t Tax) TaxDeducateHandler(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, ResPersonalDeduction{PersonalDeduction: req.Amount})
 }
+
+func (t Tax) TaxDeducateKreceiptHandler(c echo.Context) error {
+	var req ReqAmount
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, Err{Message: "invalid request"})
+	}
+
+	personal, err := t.info.GetTaxDeducationByType("K-Receipt")
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to get k-receipt deduction: %v", err)})
+	}
+	if req.Amount > personal.Maximum_amount {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Amount should be less than 100,000"})
+	} else if req.Amount < personal.Minimum_amount {
+		return c.JSON(http.StatusBadRequest, Err{Message: "Amount should be more than 0"})
+	}
+
+	if ok := t.info.SetTaxDeducationByType("K-Receipt", req.Amount); ok != nil {
+		return c.JSON(http.StatusInternalServerError, Err{Message: fmt.Sprintf("failed to set k-receipt deduction: %v", ok)})
+	}
+
+	return c.JSON(http.StatusOK, ResKReceiptDeduction{KReceipt: req.Amount})
+}
